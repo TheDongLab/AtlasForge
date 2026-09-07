@@ -4,6 +4,7 @@
 
 """Define and merge the genomic regions retained by the browser pipeline."""
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -39,7 +40,7 @@ def flank_for(span: int, flank_min: int, flank_max: int, min_width: int) -> int:
 
 
 def gene_windows(
-    rows,
+    rows: Iterable[tuple[str, str, str | None, int | None, int | None, str | None]],
     *,
     flank_min: int = FLANK_MIN,
     flank_max: int = FLANK_MAX,
@@ -100,7 +101,12 @@ def load(
     min_width: int = MIN_WIDTH,
 ) -> tuple[list[Window], list[str]]:
     """Read the gene and chromosome tables and create a window for each gene."""
-    genes = pl.read_csv(genes_path, separator="\t", columns=GENE_COLUMNS).select(GENE_COLUMNS)
+    genes = pl.read_csv(
+        genes_path,
+        separator="\t",
+        columns=GENE_COLUMNS,
+        schema_overrides={"chromosome": pl.String},
+    ).select(GENE_COLUMNS)
     sizes = chrom_names.sizes(chrom_names.read_chroms(chroms_path))
     alias, _ = chrom_names.alias_map(sizes, genes["chromosome"].unique().to_list())
     return gene_windows(

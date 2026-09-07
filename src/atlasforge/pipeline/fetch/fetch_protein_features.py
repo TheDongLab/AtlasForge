@@ -141,6 +141,10 @@ def run(map_path: Path, out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, schema=SCHEMA).write_csv(out_path, separator="\t")
 
-    counts = pl.DataFrame(rows)["feature_type"].value_counts().sort("feature_type")
+    if not rows:
+        console.success(f"Wrote no topology or binding features -> {out_path}")
+        return
+
+    counts = pl.DataFrame(rows, schema=SCHEMA)["feature_type"].value_counts().sort("feature_type")
     summary = ", ".join(f"{r['feature_type']}={r['count']}" for r in counts.iter_rows(named=True))
     console.success(f"Wrote {len(rows)} features ({summary}) -> {out_path}")
