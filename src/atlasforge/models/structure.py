@@ -122,5 +122,6 @@ class DataSourceRecord(BaseModel):
     assembly: str | None = None
     retrieved_date: str | None = None
     citation: str | None = None
+    citation_url: str | None = None
     license_spdx: str | None = None
     url: str | None = None

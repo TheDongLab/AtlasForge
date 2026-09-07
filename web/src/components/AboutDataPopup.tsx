@@ -165,7 +165,19 @@ export default function AboutDataPopup() {
                         color="text.secondary"
                         sx={{ display: "block", mt: -0.25 }}
                       >
-                        {rec.citation}
+                        {rec.citation_url ? (
+                          <Link
+                            href={rec.citation_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            color="inherit"
+                            underline="hover"
+                          >
+                            {rec.citation}
+                          </Link>
+                        ) : (
+                          rec.citation
+                        )}
                       </Typography>
                     )}
                   </Box>

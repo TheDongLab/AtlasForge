@@ -35,6 +35,8 @@ ENSEMBL_ASSEMBLY = (
 GENCODE_BEHIND_ENSEMBL = 66
 
 LICENSE = "CC-BY-4.0"
+GENCODE_CITATION = "Mudge et al. Nucleic Acids Res 53:D966 (2025)"
+GENCODE_DOI = "https://doi.org/10.1093/nar/gkae1078"
 
 
 def gencode_release(ensembl_release: int, override: str) -> str:
@@ -93,7 +95,10 @@ def overlapping(transcripts, merged: dict[str, list[tuple[int, int]]]) -> list:
 
 
 def write_provenance(path: Path, *, version: str, url: str, assembly_name: str, flank: str) -> None:
-    header = "source\tkind\tversion\tassembly\tretrieved_date\tlicense_spdx\turl\tdetail"
+    header = (
+        "source\tkind\tversion\tassembly\tretrieved_date\tlicense_spdx"
+        "\tcitation\tcitation_url\turl\tdetail"
+    )
     row = "\t".join(
         (
             version,
@@ -102,6 +107,8 @@ def write_provenance(path: Path, *, version: str, url: str, assembly_name: str, 
             assembly_name,
             date.today().isoformat(),
             LICENSE if url else "",
+            GENCODE_CITATION if url else "",
+            GENCODE_DOI if url else "",
             url,
             flank,
         )

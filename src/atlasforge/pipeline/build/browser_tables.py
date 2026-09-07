@@ -82,6 +82,7 @@ SOURCES_SCHEMA = {
     "assembly": pl.Utf8,
     "retrieved_date": pl.Utf8,
     "citation": pl.Utf8,
+    "citation_url": pl.Utf8,
     "license_spdx": pl.Utf8,
     "url": pl.Utf8,
 }

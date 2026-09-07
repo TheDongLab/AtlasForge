@@ -22,6 +22,7 @@ SOURCE_COLUMNS = (
     "assembly",
     "retrieved_date",
     "citation",
+    "citation_url",
     "license_spdx",
     "url",
 )
