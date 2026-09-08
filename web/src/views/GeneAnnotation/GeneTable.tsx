@@ -54,22 +54,6 @@ const bodySx = (theme: Theme) => ({
   "& td.gene-links": {
     whiteSpace: "nowrap",
   },
-  "& .gene-external-link": {
-    display: "inline-flex",
-    alignItems: "center",
-    verticalAlign: "middle",
-    gap: "6px",
-    padding: "4px 5px",
-    borderRadius: 1,
-    color: "primary.main",
-    fontSize: "0.8125rem",
-    fontWeight: 500,
-    lineHeight: 1.75,
-    textDecoration: "none",
-    "&:hover": { bgcolor: "action.hover" },
-    "& svg": { width: 18, height: 18, fill: "currentColor" },
-  },
-  "& .gene-external-link + .gene-external-link": { marginLeft: "2px" },
 })
 
 export default function GeneTable({

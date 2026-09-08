@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type ReactNode } from "react"
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { Box, Button, Divider } from "@mui/material"
+import ExternalLink from "@/components/ExternalLink"
 import FloatingPanel, { type StatRow } from "@/components/FloatingPanel"
 import { capBoxSx, capButtonSx } from "@/theme"
 import type { Gene } from "@/types/gene"
@@ -75,38 +75,8 @@ export default function FloatingGenePanel({
           </Button>
         )}
         <Box sx={{ display: "flex", gap: 0.5 }}>
-          {geneId && (
-            <Button
-              size="small"
-              variant="text"
-              startIcon={<OpenInNewIcon />}
-              component="a"
-              href={ensemblUrl(geneId)}
-              target="_blank"
-              rel="noopener"
-              sx={{ flex: 1, ...capButtonSx }}
-            >
-              <Box component="span" sx={capBoxSx}>
-                Ensembl
-              </Box>
-            </Button>
-          )}
-          {ucscGene && (
-            <Button
-              size="small"
-              variant="text"
-              startIcon={<OpenInNewIcon />}
-              component="a"
-              href={ucscUrl(ucscGene)}
-              target="_blank"
-              rel="noopener"
-              sx={{ flex: 1, ...capButtonSx }}
-            >
-              <Box component="span" sx={capBoxSx}>
-                UCSC
-              </Box>
-            </Button>
-          )}
+          {geneId && <ExternalLink href={ensemblUrl(geneId)}>Ensembl</ExternalLink>}
+          {ucscGene && <ExternalLink href={ucscUrl(ucscGene)}>UCSC</ExternalLink>}
         </Box>
       </Box>
     </>

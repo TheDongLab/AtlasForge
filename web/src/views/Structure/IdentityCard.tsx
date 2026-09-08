@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"
-import { Alert, Box, Button, Link, Stack, Typography, useTheme } from "@mui/material"
+import { Alert, Box, Link, Stack, Typography, useTheme } from "@mui/material"
+import ExternalLink from "@/components/ExternalLink"
 import FamilyLabel from "@/components/FamilyLabel"
 import { capBoxSx } from "@/theme"
 import { getFamilyColor } from "@/utils/familyColor"
@@ -38,31 +38,6 @@ const SEQ_AGREEMENT_DETAIL: Record<string, string> = {
 interface LinkOut {
   label: string
   href: string
-}
-
-function ExternalLink({ label, href }: LinkOut) {
-  return (
-    <Button
-      size="small"
-      variant="text"
-      startIcon={<OpenInNewIcon />}
-      component="a"
-      href={href}
-      target="_blank"
-      rel="noopener"
-      sx={{
-        p: 0.75,
-        minWidth: 0,
-        lineHeight: 1,
-        justifyContent: "flex-start",
-        "& .MuiButton-startIcon": { ml: 0 },
-      }}
-    >
-      <Box component="span" sx={capBoxSx}>
-        {label}
-      </Box>
-    </Button>
-  )
 }
 
 const MARK_LABELS: Record<MarkKind, string> = {
@@ -231,7 +206,9 @@ export default function IdentityCard({ structure, gene, hasMembrane, marks, sign
         }}
       >
         {links.map((link) => (
-          <ExternalLink key={link.label} {...link} />
+          <ExternalLink key={link.label} href={link.href}>
+            {link.label}
+          </ExternalLink>
         ))}
       </Box>
 

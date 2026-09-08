@@ -18,13 +18,13 @@ import {
   useTheme,
 } from "@mui/material"
 import { alpha } from "@mui/material/styles"
+import ExternalLink from "@/components/ExternalLink"
 import FamilyChip from "@/components/FamilyChip"
 import { useUIStore } from "@/store/uiStore"
 import type { Gene } from "@/types/gene"
 import { formatPosition } from "@/utils/format"
 import { ensemblUrl, ucscUrl } from "@/utils/links"
 import { SELECTED_ROW_TOP_GAP } from "./constants"
-import ExternalLink from "./ExternalLink"
 import TranscriptTable from "./TranscriptTable"
 
 interface GeneRowProps {
