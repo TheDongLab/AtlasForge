@@ -60,8 +60,8 @@ export function useClusteringState() {
   )
   usePublishPopup(popupContent, !!data)
 
-  const families = useMemo(() => uniqueFamilies(data ?? []), [data])
-  const genes = useMemo(() => uniqueGeneOptions(data ?? []), [data])
+  const families = useMemo(() => uniqueFamilies(data ?? [], geneById), [data, geneById])
+  const genes = useMemo(() => uniqueGeneOptions(data ?? [], geneById), [data, geneById])
 
   return {
     data,

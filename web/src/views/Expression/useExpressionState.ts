@@ -56,8 +56,8 @@ export function useExpressionState() {
   )
   usePublishPopup(popupContent, !!rows)
 
-  const families = useMemo(() => uniqueFamilies(rows ?? []), [rows])
-  const genes = useMemo(() => uniqueGeneOptions(rows ?? []), [rows])
+  const families = useMemo(() => uniqueFamilies(rows ?? [], geneById), [rows, geneById])
+  const genes = useMemo(() => uniqueGeneOptions(rows ?? [], geneById), [rows, geneById])
   const presentTissues = useMemo(() => new Set((rows ?? []).map((r) => r.tissue)), [rows])
 
   return {

@@ -2,36 +2,28 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type React from "react"
-import { Autocomplete, TextField, Typography } from "@mui/material"
-import { StyledPopper, acIndicatorSx, acInputSx, acOptionStyle } from "./styles"
-import { VirtualListboxSm } from "./VirtualListbox"
+import { useMemo } from "react"
+import { Autocomplete, TextField } from "@mui/material"
+import type { GeneSearchable } from "@/utils/geneSearch"
+import { buildGeneIndex, searchGeneIndex } from "@/utils/geneSearch"
+import { renderTwoLineOption } from "./renderTwoLineOption"
+import { StyledPopper, acIndicatorSx, acInputSx } from "./styles"
+import { VirtualListboxPanel } from "./VirtualListbox"
 
-export interface GeneOption {
-  id: string
-  symbol: string
+export type GeneOption = GeneSearchable
+
+export interface FamilyOption {
+  family: string
+  family_name: string
 }
 
 interface Props {
-  families: string[]
+  families: FamilyOption[]
   genes: GeneOption[]
   familyFilter: string | null
   onFamilyChange: (family: string | null) => void
   selectedGeneId: string | null
   onGeneChange: (gene: GeneOption | null) => void
-}
-
-type OptionProps = { key: React.Key } & React.HTMLAttributes<HTMLLIElement>
-
-function renderOption(props: object, label: string) {
-  const { key, ...rest } = props as OptionProps
-  return (
-    <li key={key} {...rest} style={{ ...rest.style, ...acOptionStyle }}>
-      <Typography variant="body2" fontWeight={600}>
-        {label}
-      </Typography>
-    </li>
-  )
 }
 
 export default function GeneSearchPanel({
@@ -42,16 +34,26 @@ export default function GeneSearchPanel({
   selectedGeneId,
   onGeneChange,
 }: Props) {
+  const geneIndex = useMemo(() => buildGeneIndex(genes), [genes])
   return (
     <>
-      <Autocomplete
+      <Autocomplete<FamilyOption>
         size="small"
         options={families}
-        value={familyFilter}
-        onChange={(_, v) => onFamilyChange(v)}
+        getOptionLabel={(o) => o.family}
+        isOptionEqualToValue={(o, v) => o.family === v.family}
+        value={families.find((f) => f.family === familyFilter) ?? null}
+        onChange={(_, v) => onFamilyChange(v?.family ?? null)}
+        filterOptions={(opts, { inputValue }) => {
+          const q = inputValue.trim().toLowerCase()
+          if (!q) return opts
+          return opts.filter(
+            (o) => o.family.toLowerCase().includes(q) || o.family_name.toLowerCase().includes(q),
+          )
+        }}
         sx={{ width: "100%", ...acIndicatorSx }}
-        slots={{ listbox: VirtualListboxSm, popper: StyledPopper }}
-        renderOption={(props, option) => renderOption(props, option)}
+        slots={{ listbox: VirtualListboxPanel, popper: StyledPopper }}
+        renderOption={(props, o) => renderTwoLineOption(props, o.family, o.family_name)}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -69,14 +71,15 @@ export default function GeneSearchPanel({
         isOptionEqualToValue={(o, v) => o.id === v.id}
         value={genes.find((g) => g.id === selectedGeneId) ?? null}
         onChange={(_, v) => onGeneChange(v)}
+        filterOptions={(_, state) => searchGeneIndex(geneIndex, state.inputValue)}
         sx={{ width: "100%", ...acIndicatorSx }}
-        slots={{ listbox: VirtualListboxSm, popper: StyledPopper }}
-        renderOption={(props, option) => renderOption(props, option.symbol)}
+        slots={{ listbox: VirtualListboxPanel, popper: StyledPopper }}
+        renderOption={(props, option) => renderTwoLineOption(props, option.symbol, option.name)}
         renderInput={(params) => (
           <TextField
             {...params}
             size="small"
-            placeholder="Find gene…"
+            placeholder="Symbol, name, ID, alias…"
             color="primary"
             sx={acInputSx}
           />

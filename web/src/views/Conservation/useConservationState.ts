@@ -65,8 +65,8 @@ export function useConservationState(cellMetric: CellMetricKey) {
   )
   usePublishPopup(popupContent, !!cells)
 
-  const families = useMemo(() => uniqueFamilies(cells ?? []), [cells])
-  const genes = useMemo(() => uniqueGeneOptions(cells ?? []), [cells])
+  const families = useMemo(() => uniqueFamilies(cells ?? [], geneById), [cells, geneById])
+  const genes = useMemo(() => uniqueGeneOptions(cells ?? [], geneById), [cells, geneById])
   const nSpecies = useMemo(
     () => (speciesNodes ? speciesNodes.filter((n) => n.species).length : 0),
     [speciesNodes],

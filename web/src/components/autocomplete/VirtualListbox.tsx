@@ -8,7 +8,7 @@ import { FixedSizeList, type ListChildComponentProps } from "react-window"
 const LISTBOX_PADDING = 2
 const MAX_VISIBLE = 8
 const ITEM_SIZE = 50
-const SM_ITEM_SIZE = 36
+const PANEL_MAX_VISIBLE = 6
 
 type StyledElement = React.ReactElement<{ style?: React.CSSProperties }>
 
@@ -35,7 +35,7 @@ const OuterElementType = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
   },
 )
 
-function makeVirtualListbox(itemSize: number) {
+function makeVirtualListbox(itemSize: number, maxVisible: number) {
   return forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLElement>>(function VirtualListbox(
     { children, ...other },
     ref,
@@ -45,7 +45,7 @@ function makeVirtualListbox(itemSize: number) {
 
     const itemData = useMemo(() => React.Children.toArray(children) as StyledElement[], [children])
     const itemCount = itemData.length
-    const height = Math.min(itemCount, MAX_VISIBLE) * itemSize + LISTBOX_PADDING
+    const height = Math.min(itemCount, maxVisible) * itemSize + LISTBOX_PADDING
 
     return (
       <OuterElementContext.Provider value={other as React.HTMLAttributes<HTMLDivElement>}>
@@ -67,5 +67,5 @@ function makeVirtualListbox(itemSize: number) {
   })
 }
 
-export const VirtualListbox = makeVirtualListbox(ITEM_SIZE)
-export const VirtualListboxSm = makeVirtualListbox(SM_ITEM_SIZE)
+export const VirtualListbox = makeVirtualListbox(ITEM_SIZE, MAX_VISIBLE)
+export const VirtualListboxPanel = makeVirtualListbox(ITEM_SIZE, PANEL_MAX_VISIBLE)
