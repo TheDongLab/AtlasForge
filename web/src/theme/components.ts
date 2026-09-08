@@ -24,6 +24,11 @@ export function componentOverrides(c: DoomColors, mode: ThemeMode): ThemeOptions
         root: { backgroundImage: "none" },
       },
     },
+    MuiLink: {
+      styleOverrides: {
+        root: { fontWeight: 600 },
+      },
+    },
     MuiTableCell: {
       styleOverrides: {
         root: { borderColor: divider },

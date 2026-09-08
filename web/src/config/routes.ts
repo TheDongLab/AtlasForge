@@ -63,3 +63,7 @@ export type RoutePath = (typeof ROUTES)[number]["path"]
 export const HOME_ROUTE = ROUTES[0]
 
 export const POPUP_PATHS = new Set<string>(ROUTES.filter((r) => r.popup).map((r) => r.path))
+
+export const EXTRA_PAGE_PATHS = ["/about"]
+
+export const PAGE_PATHS = [...ROUTES.map((r) => r.path), ...EXTRA_PAGE_PATHS]

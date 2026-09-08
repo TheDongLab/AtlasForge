@@ -8,7 +8,7 @@ import { VitePWA } from "vite-plugin-pwa"
 import { fileURLToPath, URL } from "node:url"
 import { doomColors } from "./src/theme/palette"
 import { resolveAtlasConfig, type AtlasConfig } from "./src/config/product"
-import { ROUTES } from "./src/config/routes"
+import { PAGE_PATHS } from "./src/config/routes"
 
 const doomScssVars = Object.entries(doomColors)
   .flatMap(([mode, colors]) =>
@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
           this.emitFile({
             type: "asset",
             fileName: "routes.json",
-            source: JSON.stringify(ROUTES.map((r) => r.path)),
+            source: JSON.stringify(PAGE_PATHS),
           })
           this.emitFile({
             type: "asset",

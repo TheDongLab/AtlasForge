@@ -74,6 +74,9 @@ export function AppNavTabs() {
       scrollButtons="auto"
       allowScrollButtonsMobile
       sx={{ flex: 1, minWidth: 0 }}
+      slotProps={{
+        indicator: { style: activeIndex === -1 ? { left: "100%", width: 0 } : undefined },
+      }}
     >
       {visible.map((r) => (
         <NavTab key={r.path} label={r.label} description={r.description} />

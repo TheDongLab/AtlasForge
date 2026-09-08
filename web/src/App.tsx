@@ -8,10 +8,10 @@ import { AppNavMenu, AppNavTabs } from "./components/AppNav"
 import ThemeToggle from "./components/ThemeToggle"
 import AppInfoButton from "./components/AppInfoButton"
 import GeneInfoPopup from "./components/GeneInfoPopup"
-import AboutDataPopup from "./components/AboutDataPopup"
 import ShareUrlSync from "./components/ShareUrlSync"
 import { routes } from "./routes"
 import { atlas } from "./config/atlas"
+import About from "./views/About"
 import Home from "./views/Home"
 import NotFound from "./views/NotFound"
 
@@ -23,10 +23,11 @@ export default function App() {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100dvh" }}>
       <ShareUrlSync />
       <AppBar
-        position="static"
+        position="relative"
         color="default"
         elevation={1}
         sx={{
+          zIndex: 1,
           pt: "env(safe-area-inset-top)",
           pl: "env(safe-area-inset-left)",
           pr: "env(safe-area-inset-right)",
@@ -69,11 +70,11 @@ export default function App() {
             <Route key={r.path} path={r.path} element={r.element} />
           ))}
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
       <GeneInfoPopup />
-      <AboutDataPopup />
     </Box>
   )
 }

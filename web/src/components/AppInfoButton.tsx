@@ -2,20 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { Link as RouterLink, useLocation } from "react-router-dom"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { IconButton, Tooltip } from "@mui/material"
-import { useUIStore } from "@/store/uiStore"
 
 export default function AppInfoButton() {
-  const open = useUIStore((s) => s.aboutOpen)
-  const setOpen = useUIStore((s) => s.setAboutOpen)
+  const active = useLocation().pathname === "/about"
 
   return (
     <Tooltip title="About">
       <IconButton
-        onClick={() => setOpen(!open)}
+        component={RouterLink}
+        to="/about"
         size="small"
-        color={open ? "secondary" : "inherit"}
+        color={active ? "secondary" : "inherit"}
         aria-label="About"
       >
         <InfoOutlinedIcon fontSize="small" />

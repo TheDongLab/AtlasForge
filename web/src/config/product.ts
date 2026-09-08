@@ -13,6 +13,21 @@ export interface AtlasConfig {
 export const PRODUCT_NAME = "AtlasForge"
 export const PRODUCT_URL = "https://github.com/TheDongLab/AtlasForge"
 
+export const DEVELOPER = "Chenhang Christopher Zhang"
+
+export const DONG_LAB = {
+  name: "Dong Lab",
+  url: "https://donglab.org",
+  logo: { light: "/donglab-logo-dark.png", dark: "/donglab-logo-white.png" },
+  center: "Adams Center for Parkinson's Disease Research",
+  institution: "Yale University",
+}
+
+export const LICENSE = {
+  spdx: "Apache-2.0",
+  url: "https://github.com/TheDongLab/AtlasForge/blob/main/LICENSE",
+}
+
 export const ATLAS_DEFAULTS: AtlasConfig = {
   name: PRODUCT_NAME,
   shortName: PRODUCT_NAME,

@@ -61,8 +61,6 @@ interface UIState {
   setBrowserPrefs: (next: Partial<BrowserPrefs>) => void
   browserMode: GeneTrackMode
   setBrowserMode: (mode: GeneTrackMode) => void
-  aboutOpen: boolean
-  setAboutOpen: (open: boolean) => void
   windowStack: string[]
   raiseWindow: (key: string) => void
 }
@@ -137,8 +135,6 @@ export const useUIStore = create<UIState>()(
         clearModeOverride()
         set({ browserMode: mode })
       },
-      aboutOpen: false,
-      setAboutOpen: (open) => set({ aboutOpen: open }),
       windowStack: [],
       raiseWindow: (key) =>
         set((s) =>
