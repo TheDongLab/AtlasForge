@@ -61,8 +61,14 @@ function NavTab({ description, ...tabProps }: TabProps & { description: string }
 
 export function AppNavTabs() {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const visible = useVisibleRoutes()
   const activeIndex = useActiveRoute(visible)
+
+  const parkedStyle =
+    activeIndex === -1
+      ? { width: 0, left: pathname.startsWith("/about") ? "100%" : 0 }
+      : undefined
 
   return (
     <Tabs
@@ -74,9 +80,7 @@ export function AppNavTabs() {
       scrollButtons="auto"
       allowScrollButtonsMobile
       sx={{ flex: 1, minWidth: 0 }}
-      slotProps={{
-        indicator: { style: activeIndex === -1 ? { left: "100%", width: 0 } : undefined },
-      }}
+      slotProps={{ indicator: { style: parkedStyle } }}
     >
       {visible.map((r) => (
         <NavTab key={r.path} label={r.label} description={r.description} />
