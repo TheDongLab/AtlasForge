@@ -2,12 +2,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-"""Get hold of the HGNC gene table that every later fetch step reads.
+"""Fetch an HGNC group table or resolve a gene list against the HGNC complete set.
 
-Given a group id, the table is downloaded from HGNC as it stands. Given a list of genes,
-each one is looked up in the bulk hgnc_complete_set.txt and the results are written out
-with the same thirteen columns, so that no later step has to know which of the two the
-table came from.
+Gene lists accept an optional family group after each gene. Ungrouped entries use
+the file name without its extension as their group name.
 """
 
 import csv
@@ -131,10 +129,14 @@ def _parts(value: str | None) -> list[str]:
     return [part.strip() for part in _clean(value).split("|") if part.strip()]
 
 
-def _read_names(path: Path) -> list[str]:
-    text = path.read_text(encoding="utf-8")
-    lines = (line.split("#", 1)[0].strip() for line in text.splitlines())
-    return [line for line in lines if line]
+def _read_names(path: Path) -> list[tuple[str, str]]:
+    """Read gene names and optional family groups, ignoring comments and blank lines."""
+    entries: list[tuple[str, str]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        parts = line.split("#", 1)[0].split(maxsplit=1)
+        if parts:
+            entries.append((parts[0], parts[1].strip() if len(parts) > 1 else ""))
+    return entries
 
 
 def _index(path: Path) -> tuple[dict[str, dict], list[dict[str, list[dict]]]]:
@@ -185,10 +187,10 @@ def _resolve_list(path: Path, cache_dir: Path) -> list[list[str]]:
     rows: list[list[str]] = []
     ambiguous: list[str] = []
     missing: list[str] = []
-    for name in _read_names(path):
+    for name, group in _read_names(path):
         found = _matches(name, exact, fallbacks)
         if len(found) == 1:
-            rows.append(_group_row(found[0], path.stem))
+            rows.append(_group_row(found[0], group or path.stem))
         elif found:
             ambiguous.append(f"{name}: {', '.join(sorted(_clean(r['symbol']) for r in found))}")
         else:

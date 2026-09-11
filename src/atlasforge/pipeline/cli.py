@@ -51,8 +51,8 @@ def _settings_data_dir(_: Mapping[str, Any]) -> Path:
 FETCH = (
     Option(
         "source",
-        "HGNC group ID, gene-list file with one symbol or Ensembl gene ID per line, or "
-        "downloaded HGNC group TSV",
+        "HGNC group ID, gene-list file with one symbol or Ensembl gene ID per line and an "
+        "optional family group after it, or downloaded HGNC group TSV",
         default="",
         positional=True,
         prompt="HGNC group ID or gene-list file",

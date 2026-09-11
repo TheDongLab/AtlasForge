@@ -53,6 +53,7 @@ update any missing data.
 
 * Documentation
 See the [[file:docs/README.org][documentation overview]] for guides to AtlasForge's files and performance.
+See [[file:docs/example-atlases.org][Example atlases]] for building the atlas using histone and HOX examples.
 
 * Available Views
 - Genes :: Gene annotation and expandable transcript details

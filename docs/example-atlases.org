@@ -1,0 +1,152 @@
+#+title: Example Atlases
+
+This document shows how to build an atlas from an HGNC group ID or a gene list
+using the histone and HOX gene families as reference.
+
+The examples use remote structure and coverage files to limit local storage.
+They restrict genome browser data to gene windows and skip the curation review
+prompt. Omit these flags to choose interactively. See the README's [[file:../README.org::*Fetch and build options][fetch and
+build options]] for details.
+
+* Histones (from HGNC group ID 864)
+Run the AtlasForge pipeline using HGNC group ID 864:
+
+#+begin_src bash
+# Fetch the editable source files for the family
+atlasforge fetch 864 \
+  --data-dir histones \
+  --curation-dir histones/curation \
+  --gtex-version v11 \
+  --ensembl-release 116 \
+  --no-download-predicted \
+  --no-download-experimental \
+  --no-local-coverage \
+  --no-browser-whole-genome \
+  --no-review
+
+# Build the app files
+atlasforge build --data-dir histones
+
+# Serve using dynamic server
+atlasforge serve \
+  --data-dir histones \
+  --port 8080 \
+  --app-name "Histone Gene Family Atlas" \
+  --app-short-name "Histone Atlas" \
+  --app-description "A browsable atlas of the human histone gene family." \
+  --family-label "histone" \
+  --download-prefix "histone"
+
+# Or export a static site for any file server
+atlasforge export histones-site \
+  --data-dir histones \
+  --app-name "Histone Gene Family Atlas" \
+  --app-short-name "Histone Atlas" \
+  --app-description "A browsable atlas of the human histone gene family." \
+  --family-label "histone" \
+  --download-prefix "histone"
+#+end_src
+
+* HOX (from a gene list)
+Create a list with one gene symbol or Ensembl gene ID per line. The optional
+second column assigns the gene to a family group, separated by tab or spaces.
+This example list groups HOX genes by cluster:
+
+#+begin_src bash
+mkdir -p hox/curation
+cat > hox/hox_genes.txt <<'EOF'
+HOXA1	HOXA
+HOXA2	HOXA
+HOXA3	HOXA
+HOXA4	HOXA
+HOXA5	HOXA
+HOXA6	HOXA
+HOXA7	HOXA
+HOXA9	HOXA
+HOXA10	HOXA
+HOXA11	HOXA
+HOXA13	HOXA
+HOXB1	HOXB
+HOXB2	HOXB
+HOXB3	HOXB
+HOXB4	HOXB
+HOXB5	HOXB
+HOXB6	HOXB
+HOXB7	HOXB
+HOXB8	HOXB
+HOXB9	HOXB
+HOXB13	HOXB
+HOXC4	HOXC
+HOXC5	HOXC
+HOXC6	HOXC
+HOXC8	HOXC
+HOXC9	HOXC
+HOXC10	HOXC
+HOXC11	HOXC
+HOXC12	HOXC
+HOXC13	HOXC
+HOXD1	HOXD
+HOXD3	HOXD
+HOXD4	HOXD
+HOXD8	HOXD
+HOXD9	HOXD
+HOXD10	HOXD
+HOXD11	HOXD
+HOXD12	HOXD
+HOXD13	HOXD
+EOF
+#+end_src
+
+The group is stored in the gene table's ~Group name~ column. Use matching
+~group_name~ values in the ~families.tsv~ curation file to set each cluster's label:
+
+#+begin_src bash
+cat > hox/curation/families.tsv <<'EOF'
+group_name	family_key	display_name
+HOXA	HOXA	HOXA cluster (chr7)
+HOXB	HOXB	HOXB cluster (chr17)
+HOXC	HOXC	HOXC cluster (chr12)
+HOXD	HOXD	HOXD cluster (chr2)
+EOF
+#+end_src
+
+Then run the pipeline using your gene list and curation file:
+
+#+begin_src bash
+atlasforge fetch hox/hox_genes.txt \
+  --data-dir hox \
+  --curation-dir hox/curation \
+  --gtex-version v11 \
+  --ensembl-release 116 \
+  --no-download-predicted \
+  --no-download-experimental \
+  --no-local-coverage \
+  --no-browser-whole-genome \
+  --no-review
+
+atlasforge build --data-dir hox
+
+atlasforge serve \
+  --data-dir hox \
+  --port 8080 \
+  --app-name "HOX Gene Family Atlas" \
+  --app-short-name "HOX Atlas" \
+  --app-description "A browsable atlas of the human HOX (homeobox) gene family." \
+  --family-label "HOX" \
+  --download-prefix hox
+
+atlasforge export hox-site \
+  --data-dir hox \
+  --app-name "HOX Gene Family Atlas" \
+  --app-short-name "HOX Atlas" \
+  --app-description "A browsable atlas of the human HOX (homeobox) gene family." \
+  --family-label "HOX" \
+  --download-prefix hox
+#+end_src
+
+* Choosing serve or export
+~atlasforge serve~ runs the dynamic FastAPI server and generates API responses
+on demand, which is convenient for local use. ~atlasforge export~ writes a static
+site that can be hosted using other web servers, which is the better choice for
+public or high-traffic deployments. See [[file:../README.org::*Deployment][Deployment]] in the README for Docker and
+static-hosting details.
