@@ -5,7 +5,7 @@ using the histone and HOX gene families as reference.
 
 The examples use remote structure and coverage files to limit local storage.
 They restrict genome browser data to gene windows and skip the curation review
-prompt. Omit these flags to choose interactively. See the README's [[file:../README.org::*Fetch and build options][fetch and
+prompt. Omit these flags to choose interactively. See the README's [[file:../README.org#fetch-and-build-options][fetch and
 build options]] for details.
 
 * Histones (from HGNC group ID 864)
@@ -148,5 +148,5 @@ atlasforge export hox-site \
 ~atlasforge serve~ runs the dynamic FastAPI server and generates API responses
 on demand, which is convenient for local use. ~atlasforge export~ writes a static
 site that can be hosted using other web servers, which is the better choice for
-public or high-traffic deployments. See [[file:../README.org::*Deployment][Deployment]] in the README for Docker and
+public or high-traffic deployments. See [[file:../README.org#deployment][Deployment]] in the README for Docker and
 static-hosting details.
