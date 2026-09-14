@@ -51,6 +51,7 @@ function GeneRow({ gene, isSelected, expanded, onToggleExpanded, onFamilyClick }
     fontFamily: "inherit",
     fontSize: "inherit",
     ml: "-7px",
+    userSelect: "text",
     border: "1px solid transparent",
     bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.22) : "transparent",
     color: isSelected ? "primary.main" : "text.primary",

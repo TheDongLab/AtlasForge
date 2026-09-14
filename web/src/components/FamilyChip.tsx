@@ -28,6 +28,7 @@ export default function FamilyChip({ family, label, onClick }: FamilyChipProps) 
           fontWeight: 500,
           maxWidth: 220,
           ml: "-8px",
+          userSelect: "text",
           ...(onClick && { cursor: "pointer" }),
           "& .MuiChip-label": {
             overflow: "hidden",
