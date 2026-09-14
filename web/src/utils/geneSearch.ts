@@ -7,33 +7,48 @@ export interface GeneSearchable {
   symbol: string
   name: string
   alias: string | null
+  category?: string | null
+  family?: string | null
+  family_name?: string | null
 }
 
 interface IndexedGene<T> {
   item: T
   symbol: string
-  id: string
-  name: string
-  alias: string
+  fields: string[]
+}
+
+function searchFields(g: GeneSearchable): string[] {
+  return [
+    g.symbol,
+    g.id,
+    g.name,
+    g.alias ?? "",
+    g.category ?? "",
+    g.family ?? "",
+    g.family_name ?? "",
+  ]
 }
 
 export function buildGeneIndex<T extends GeneSearchable>(genes: T[]): IndexedGene<T>[] {
   return genes.map((g) => ({
     item: g,
     symbol: g.symbol.toLowerCase(),
-    id: g.id.toLowerCase(),
-    name: g.name.toLowerCase(),
-    alias: (g.alias ?? "").toLowerCase(),
+    fields: searchFields(g).map((f) => f.toLowerCase()),
   }))
+}
+
+export function geneMatchesQuery(gene: GeneSearchable, query: string): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  return searchFields(gene).some((f) => f.toLowerCase().includes(q))
 }
 
 export function searchGeneIndex<T>(index: IndexedGene<T>[], query: string): T[] {
   const q = query.trim().toLowerCase()
   if (!q) return index.map((i) => i.item)
   return index
-    .filter(
-      (i) => i.symbol.includes(q) || i.id.includes(q) || i.name.includes(q) || i.alias.includes(q),
-    )
+    .filter((i) => i.fields.some((f) => f.includes(q)))
     .sort((a, b) => {
       const aExact = a.symbol === q
       const bExact = b.symbol === q

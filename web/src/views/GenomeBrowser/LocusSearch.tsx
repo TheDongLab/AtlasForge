@@ -7,9 +7,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import SearchIcon from "@mui/icons-material/Search"
 import { Autocomplete, InputAdornment, TextField, Typography } from "@mui/material"
+import { useGeneById } from "@/api/hooks/useGenes"
 import { acInputSx, StyledPopper } from "@/components/autocomplete/styles"
 import { VirtualListbox } from "@/components/autocomplete/VirtualListbox"
 import type { BrowserGene } from "@/types/browser"
+import { buildGeneIndex, searchGeneIndex } from "@/utils/geneSearch"
 
 // Accept common colon, space, hyphen, and en dash coordinate formats
 const LOCUS = /^(chr)?([0-9a-z]{1,5})[:\s]+([\d,]+)[-–\s]+([\d,]+)$/i
@@ -77,42 +79,34 @@ export default function LocusSearch({
     }
   }, [regionId])
 
+  const geneById = useGeneById()
   const index = useMemo(
     () =>
-      genes.map((gene) => ({
-        gene,
-        lc: `${gene.symbol}\u0000${gene.gene_id}\u0000${gene.name ?? ""}`.toLowerCase(),
-        lcSymbol: gene.symbol.toLowerCase(),
-      })),
-    [genes],
+      buildGeneIndex(
+        genes.map((gene) => {
+          const full = geneById.get(gene.gene_id)
+          return {
+            gene,
+            id: gene.gene_id,
+            symbol: gene.symbol,
+            name: gene.name ?? "",
+            alias: full?.alias ?? null,
+            category: full?.category ?? null,
+            family: full?.family ?? null,
+            family_name: full?.family_name ?? null,
+          }
+        }),
+      ),
+    [genes, geneById],
   )
 
   const options = useMemo(() => {
     const showAll = committed !== null && text === committed
-    const query = showAll ? "" : text.trim().toLowerCase()
     // Preserve source order so family genes appear first
-    if (!query) return genes.slice(0, INITIAL_OPTIONS)
-    // Rank exact and prefix matches without sorting the full index
-    const exact = []
-    const prefix = []
-    const contains = []
-    for (const entry of index) {
-      if (entry.lcSymbol === query) exact.push(entry)
-      else if (entry.lcSymbol.startsWith(query)) prefix.push(entry)
-      else if (entry.lc.includes(query)) contains.push(entry)
-    }
-    const bySymbol = (a: (typeof index)[number], b: (typeof index)[number]) =>
-      a.lcSymbol.localeCompare(b.lcSymbol, undefined, { numeric: true })
-    const out = []
-    for (const bucket of [exact, prefix, contains]) {
-      if (out.length >= QUERY_OPTIONS) break
-      bucket.sort(bySymbol)
-      for (const entry of bucket) {
-        out.push(entry.gene)
-        if (out.length >= QUERY_OPTIONS) break
-      }
-    }
-    return out
+    if (showAll || !text.trim()) return genes.slice(0, INITIAL_OPTIONS)
+    return searchGeneIndex(index, text)
+      .slice(0, QUERY_OPTIONS)
+      .map((entry) => entry.gene)
   }, [text, index, genes, committed])
 
   const submit = useCallback(

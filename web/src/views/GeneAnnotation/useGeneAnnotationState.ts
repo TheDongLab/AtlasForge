@@ -6,6 +6,7 @@ import { useCallback, useEffect, useDeferredValue, useMemo, useState } from "rea
 import { useGenes } from "@/api/hooks/useGenes"
 import { useUIStore } from "@/store/uiStore"
 import type { Gene } from "@/types/gene"
+import { geneMatchesQuery } from "@/utils/geneSearch"
 import { FAMILY_PARAM } from "@/utils/shareParams"
 import { useShareParam } from "@/utils/useShareParam"
 import { DIR_PARAM, ROWS_PARAM, SEARCH_MIRROR_MS, SEARCH_PARAM, SORT_PARAM } from "./shareParams"
@@ -18,13 +19,8 @@ function filterGenes(genes: Gene[], searchText: string, familyFilter: string | n
   if (familyFilter) {
     result = result.filter((g) => g.family === familyFilter)
   }
-  const needle = searchText.trim().toLowerCase()
-  if (!needle) return result
-  return result.filter((g) =>
-    [g.id, g.symbol, g.name, g.alias, g.category].some((field) =>
-      field?.toLowerCase().includes(needle),
-    ),
-  )
+  if (!searchText.trim()) return result
+  return result.filter((g) => geneMatchesQuery(g, searchText))
 }
 
 function chrRank(chr: string): number {

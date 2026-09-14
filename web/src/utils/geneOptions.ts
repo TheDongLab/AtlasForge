@@ -28,7 +28,15 @@ export function uniqueGeneOptions(
   return [...seen.entries()]
     .map(([id, symbol]) => {
       const g = geneById?.get(id)
-      return { id, symbol, name: g?.name ?? symbol, alias: g?.alias ?? null }
+      return {
+        id,
+        symbol,
+        name: g?.name ?? symbol,
+        alias: g?.alias ?? null,
+        category: g?.category ?? null,
+        family: g?.family ?? null,
+        family_name: g?.family_name ?? null,
+      }
     })
     .sort((a, b) => byName(a.symbol, b.symbol))
 }
