@@ -75,8 +75,16 @@ export default function FloatingGenePanel({
           </Button>
         )}
         <Box sx={{ display: "flex", gap: 0.5 }}>
-          {geneId && <ExternalLink href={ensemblUrl(geneId)}>Ensembl</ExternalLink>}
-          {ucscGene && <ExternalLink href={ucscUrl(ucscGene)}>UCSC</ExternalLink>}
+          {geneId && (
+            <ExternalLink href={ensemblUrl(geneId)} sx={{ flex: 1, justifyContent: "center" }}>
+              Ensembl
+            </ExternalLink>
+          )}
+          {ucscGene && (
+            <ExternalLink href={ucscUrl(ucscGene)} sx={{ flex: 1, justifyContent: "center" }}>
+              UCSC
+            </ExternalLink>
+          )}
         </Box>
       </Box>
     </>

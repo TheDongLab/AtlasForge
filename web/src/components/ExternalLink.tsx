@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { styled } from "@mui/material/styles"
+import type { SxProps, Theme } from "@mui/material/styles"
 import { capBoxSx } from "@/theme"
 
 const OPEN_IN_NEW_PATH =
@@ -30,11 +31,12 @@ const Anchor = styled("a")(({ theme }) => ({
 interface Props {
   href: string
   children: React.ReactNode
+  sx?: SxProps<Theme>
 }
 
-export default function ExternalLink({ href, children }: Props) {
+export default function ExternalLink({ href, children, sx }: Props) {
   return (
-    <Anchor href={href} target="_blank" rel="noopener">
+    <Anchor href={href} target="_blank" rel="noopener" sx={sx}>
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d={OPEN_IN_NEW_PATH} />
       </svg>
