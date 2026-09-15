@@ -51,12 +51,13 @@ function GeneRow({ gene, isSelected, expanded, onToggleExpanded, onFamilyClick }
     fontFamily: "inherit",
     fontSize: "inherit",
     ml: "-7px",
+    maxWidth: "none",
     userSelect: "text",
     border: "1px solid transparent",
     bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.22) : "transparent",
     color: isSelected ? "primary.main" : "text.primary",
     "&:hover": { bgcolor: alpha(theme.palette.primary.main, isSelected ? 0.3 : 0.1) },
-    "& .MuiChip-label": { px: 0.75 },
+    "& .MuiChip-label": { px: 0.75, overflow: "visible", textOverflow: "clip" },
   }
 
   const handleSelectClick = (e: React.SyntheticEvent) => {
