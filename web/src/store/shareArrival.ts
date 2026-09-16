@@ -5,6 +5,7 @@
 // Apply shared settings after the store hydrates but before the first render
 
 import { METRIC_ORDER, type TreeMetric, type TreeTissue } from "@/api/hooks/useClustering"
+import type { ExpressionValueMode } from "@/types/expression"
 import {
   DEFAULT_PREFS,
   LANE_HEIGHT_MAX,
@@ -35,7 +36,7 @@ export const metricParam = (
   defaultValue,
 })
 
-// Tissue affects co-expression metrics only
+// Only co-expression and tissue specificity honor the selected tissue scope
 export const tissueParam = (
   key: string,
   metric?: TreeMetric,
@@ -43,7 +44,16 @@ export const tissueParam = (
   key,
   codec: enumCodec(TISSUES),
   defaultValue: "all",
-  isDefault: (value) => value === "all" || (metric !== undefined && metric !== "rna"),
+  isDefault: (value) =>
+    value === "all" || (metric !== undefined && metric !== "rna" && metric !== "tissue"),
+})
+
+const VALUE_MODES: ExpressionValueMode[] = ["tpm", "z-score"]
+
+export const valueParam = (key: string): ShareParamDescriptor<ExpressionValueMode> => ({
+  key,
+  codec: enumCodec(VALUE_MODES),
+  defaultValue: "tpm",
 })
 
 type BrowserParams = { [K in keyof BrowserPrefs]: ShareParamDescriptor<BrowserPrefs[K]> }
@@ -132,6 +142,7 @@ export function applyShareArrival() {
     case "/expression":
       applyStoreParam(metricParam("order", "rna"), (v) => ({ expressionMetric: v }))
       applyStoreParam(tissueParam("tissue"), (v) => ({ expressionTissue: v }))
+      applyStoreParam(valueParam("value"), (v) => ({ expressionValueMode: v }))
       break
     case "/browser":
       applyBrowserArrival()

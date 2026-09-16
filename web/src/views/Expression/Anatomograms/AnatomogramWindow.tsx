@@ -5,6 +5,7 @@
 import { useRef } from "react"
 import { Box, IconButton, Paper, Tooltip } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
+import type { ExpressionValueMode } from "@/types/expression"
 import ResizeHandles from "@/components/ResizeHandles"
 import { useUIStore } from "@/store/uiStore"
 import { useDraggablePanel, type PanelPos } from "@/utils/useDraggablePanel"
@@ -28,6 +29,7 @@ interface AnatomogramWindowProps {
   selectedTissue: string | null
   tpmByTissue: Map<string, number> | null
   domainMax: number
+  valueMode: ExpressionValueMode
   onPickSex: (sex: "female" | "male") => void
   onPickBrain: () => void
   onPickTissue: (tissues: string[]) => void
@@ -42,6 +44,7 @@ export default function AnatomogramWindow({
   selectedTissue,
   tpmByTissue,
   domainMax,
+  valueMode,
   onPickSex,
   onPickBrain,
   onPickTissue,
@@ -149,6 +152,7 @@ export default function AnatomogramWindow({
         selectedTissue={selectedTissue}
         tpmByTissue={tpmByTissue}
         domainMax={domainMax}
+        valueMode={valueMode}
         onPick={onPickTissue}
         fit="contain"
       />

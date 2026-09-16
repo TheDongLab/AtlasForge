@@ -51,6 +51,8 @@ export default function Expression() {
     setMetric,
     tissue,
     setTissue,
+    valueMode,
+    setValueMode,
     method,
   } = useExpressionState()
 
@@ -62,6 +64,7 @@ export default function Expression() {
 
   const rail = useExpressionRail({
     tissue,
+    valueMode,
     selectedRows: selectedInfo?.rows ?? null,
     onFocusTissue: focusTissue,
   })
@@ -137,7 +140,14 @@ export default function Expression() {
                 onTissueClick={(t) => rail.pickTissue([t])}
                 showGeneTree={showGeneTree}
                 onToggleGeneTree={() => setShowGeneTree((v) => !v)}
-                legendSlot={<ExpressionLegend rows={rows ?? []} />}
+                valueMode={valueMode}
+                legendSlot={
+                  <ExpressionLegend
+                    rows={rows ?? []}
+                    valueMode={valueMode}
+                    onValueModeChange={setValueMode}
+                  />
+                }
               />
 
               {!searchFloats && (

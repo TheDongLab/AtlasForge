@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMediaQuery } from "@mui/material"
 import { RAIL_MIN_WIDTH, useUIStore } from "@/store/uiStore"
-import type { ExpressionRow } from "@/types/expression"
+import type { ExpressionRow, ExpressionValueMode } from "@/types/expression"
 import { useElementSize } from "@/utils/useElementSize"
 import type { RailView } from "./Anatomograms"
 import {
@@ -17,11 +17,13 @@ import {
 
 interface Options {
   tissue: "all" | "brain"
+  valueMode: ExpressionValueMode
   selectedRows: ExpressionRow[] | null
   onFocusTissue: (tissues: string[]) => void
 }
 
-export function useExpressionRail({ tissue, selectedRows, onFocusTissue }: Options) {
+export function useExpressionRail({ tissue, valueMode, selectedRows, onFocusTissue }: Options) {
+  const isZScore = valueMode === "z-score"
   const railOpen = useUIStore((s) => s.railOpen)
   const setRailOpen = useUIStore((s) => s.setRailOpen)
   const railWidth = useUIStore((s) => s.railWidth)
@@ -73,16 +75,21 @@ export function useExpressionRail({ tissue, selectedRows, onFocusTissue }: Optio
   )
 
   const tpmByTissue = useMemo(
-    () => (selectedRows ? new Map(selectedRows.map((r) => [r.tissue, r.tpm])) : null),
-    [selectedRows],
+    () =>
+      selectedRows
+        ? new Map(selectedRows.map((r) => [r.tissue, isZScore ? (r.z_score ?? 0) : r.tpm]))
+        : null,
+    [selectedRows, isZScore],
   )
 
   const domainMax = useMemo(() => {
     if (!selectedRows) return 1
     let m = 0
-    for (const r of selectedRows) m = Math.max(m, Math.log2(r.tpm + 1))
+    for (const r of selectedRows) {
+      m = Math.max(m, isZScore ? Math.abs(r.z_score ?? 0) : Math.log2(r.tpm + 1))
+    }
     return m || 1
-  }, [selectedRows])
+  }, [selectedRows, isZScore])
 
   const view: RailView = tissue === "brain" ? "brain" : anatomogramSex
 
@@ -103,6 +110,7 @@ export function useExpressionRail({ tissue, selectedRows, onFocusTissue }: Optio
     startResize,
     tpmByTissue,
     domainMax,
+    valueMode,
     reduceMotion,
   }
 }

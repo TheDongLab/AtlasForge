@@ -17,3 +17,4 @@ class ExpressionCell(BaseModel):
     family: str | None = None
     tissue: str
     tpm: float
+    z_score: float | None = None

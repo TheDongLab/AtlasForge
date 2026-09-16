@@ -26,7 +26,24 @@ EXPRESSION_SCHEMA = {
     "tissue": pl.Utf8,
     "tissue_scope": pl.Utf8,
     "tpm": pl.Float64,
+    "z_score": pl.Float64,
 }
+
+
+def add_z_score(df: pl.DataFrame) -> pl.DataFrame:
+    """Calculate each gene's expression z-scores within a tissue scope.
+
+    TPM values are log2-transformed first. Genes with no variation receive a z-score of zero.
+    """
+    nonnegative = pl.col("tpm").min() >= 0
+    value = pl.when(nonnegative).then((pl.col("tpm") + 1).log(2)).otherwise(pl.col("tpm"))
+    group = ["gene_id", "tissue_scope"]
+    df = df.with_columns(value.alias("_value"))
+    mean = pl.col("_value").mean().over(group)
+    sd = pl.col("_value").std().over(group)
+    return df.with_columns(
+        pl.when(sd > 0).then((pl.col("_value") - mean) / sd).otherwise(0.0).alias("z_score")
+    ).drop("_value")
 
 
 def melt_samples(expression_path: Path) -> pl.LazyFrame:
@@ -81,12 +98,8 @@ def build_expression(source_dir: Path) -> pl.DataFrame:
         .with_columns(tissue_scope=pl.lit("brain"))
     )
 
-    return (
-        pl.concat([all_scope, brain_scope])
-        .select(*EXPRESSION_SCHEMA)
-        .collect()
-        .cast(EXPRESSION_SCHEMA)
-    )
+    combined = pl.concat([all_scope, brain_scope]).collect()
+    return add_z_score(combined).select(*EXPRESSION_SCHEMA).cast(EXPRESSION_SCHEMA)
 
 
 def run(source_dir: Path, out_dir: Path) -> None:
@@ -100,5 +113,7 @@ def run(source_dir: Path, out_dir: Path) -> None:
         scoped = df.filter(pl.col("tissue_scope") == scope)
         n_genes = scoped["gene_id"].n_unique()
         n_tissues = scoped["tissue"].n_unique()
-        console.success(f"Wrote {len(scoped)} '{scope}' rows, {n_genes} genes across {n_tissues} tissues "
-            f"-> {expression_out}")
+        console.success(
+            f"Wrote {len(scoped)} '{scope}' rows, {n_genes} genes across {n_tissues} tissues "
+            f"-> {expression_out}"
+        )

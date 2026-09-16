@@ -5,6 +5,7 @@
 import { useState } from "react"
 import { Box, Typography, useMediaQuery } from "@mui/material"
 import HoverTooltip from "@/components/HoverTooltip"
+import type { ExpressionValueMode } from "@/types/expression"
 import { displayTissue } from "@/utils/tissue"
 import { SVG_FOR } from "./svgAssets"
 import { tissueAt } from "./svgDom"
@@ -18,6 +19,7 @@ export interface AnatomogramFigureProps {
   selectedTissue: string | null
   tpmByTissue: Map<string, number> | null
   domainMax: number
+  valueMode: ExpressionValueMode
   onPick: (tissues: string[]) => void
   // "width" fills the container (docked rail), "contain" fits a fixed box (floating window)
   fit?: "width" | "contain"
@@ -29,12 +31,13 @@ export default function AnatomogramFigure({
   selectedTissue,
   tpmByTissue,
   domainMax,
+  valueMode,
   onPick,
   fit = "width",
 }: AnatomogramFigureProps) {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
   const [hover, setHover] = useState<{ tissue: string; cx: number; cy: number } | null>(null)
-  const { colors, intensityFill } = useAnatomogramColors(domainMax)
+  const { colors, intensityFill, divergingFill } = useAnatomogramColors(domainMax)
 
   const { wrapRef, partsRef } = useAnatomogramSvg({
     svg: SVG_FOR[view],
@@ -43,7 +46,7 @@ export default function AnatomogramFigure({
     selectedTissue,
     tpmByTissue,
     colors,
-    intensityFill,
+    intensityFill: valueMode === "z-score" ? divergingFill : intensityFill,
     reduceMotion,
     fit,
     hoverTissue: hover?.tissue ?? null,

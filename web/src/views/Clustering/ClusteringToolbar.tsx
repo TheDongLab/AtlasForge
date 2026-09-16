@@ -7,6 +7,7 @@ import type { Theme } from "@mui/material/styles"
 import {
   METRIC_LABEL,
   METRIC_ORDER,
+  SCOPED_METRICS,
   type TreeMetric,
   type TreeTissue,
 } from "@/api/hooks/useClustering"
@@ -68,7 +69,7 @@ export default function ClusteringToolbar({
   onResetView,
   exportItems,
 }: Props) {
-  const showTissue = metric === "rna"
+  const showTissue = SCOPED_METRICS.includes(metric)
   const counterText = `${leafCount} genes`
   const { tbState, toolbarRef, probeRefs } = useToolbarFit({
     counterText,

@@ -66,9 +66,7 @@ export function AppNavTabs() {
   const activeIndex = useActiveRoute(visible)
 
   const parkedStyle =
-    activeIndex === -1
-      ? { width: 0, left: pathname.startsWith("/about") ? "100%" : 0 }
-      : undefined
+    activeIndex === -1 ? { width: 0, left: pathname.startsWith("/about") ? "100%" : 0 } : undefined
 
   return (
     <Tabs

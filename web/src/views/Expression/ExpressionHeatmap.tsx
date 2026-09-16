@@ -12,7 +12,7 @@ import HeatmapShell from "@/components/heatmap/HeatmapShell"
 import MatrixCanvas from "@/components/heatmap/MatrixCanvas"
 import { figureExportHandlers } from "@/utils/exportFigure"
 import type { ClusterNode } from "@/types/clustering"
-import type { ExpressionRow } from "@/types/expression"
+import type { ExpressionRow, ExpressionValueMode } from "@/types/expression"
 import type { Gene } from "@/types/gene"
 import ExpressionHoverTip from "./ExpressionHoverTip"
 import TissueColumnHeader from "./TissueColumnHeader"
@@ -42,6 +42,7 @@ interface ExpressionHeatmapProps {
   showGeneTree?: boolean
   onToggleGeneTree?: () => void
   legendSlot?: React.ReactNode
+  valueMode: ExpressionValueMode
 }
 
 const ExpressionHeatmap = forwardRef<ExpressionHeatmapHandle, ExpressionHeatmapProps>(
@@ -60,6 +61,7 @@ const ExpressionHeatmap = forwardRef<ExpressionHeatmapHandle, ExpressionHeatmapP
       showGeneTree = true,
       onToggleGeneTree,
       legendSlot,
+      valueMode,
     },
     ref,
   ) {
@@ -72,6 +74,7 @@ const ExpressionHeatmap = forwardRef<ExpressionHeatmapHandle, ExpressionHeatmapP
       geneById,
       showGeneTree,
       hasLegend: !!legendSlot,
+      valueMode,
     })
 
     useImperativeHandle(
@@ -145,7 +148,11 @@ const ExpressionHeatmap = forwardRef<ExpressionHeatmapHandle, ExpressionHeatmapP
           legendSlot={legendSlot}
           headerH={h.headerH}
           containerH={h.containerH}
-          overlay={h.hover ? <ExpressionHoverTip hover={h.hover} monoFont={h.monoFont} /> : null}
+          overlay={
+            h.hover ? (
+              <ExpressionHoverTip hover={h.hover} monoFont={h.monoFont} valueMode={valueMode} />
+            ) : null
+          }
           onPointerLeave={h.clearHover}
           onBackgroundClick={() => h.pickGene(null)}
           sidebar={

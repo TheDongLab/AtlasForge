@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, IconButton, Tooltip } from "@mui/material"
+import type { ExpressionValueMode } from "@/types/expression"
 import AnatomogramAttribution from "./Attribution"
 import AnatomogramHeader from "./AnatomogramHeader"
 import FigureFrame from "./FigureFrame"
@@ -18,6 +19,7 @@ interface RailProps {
   selectedTissue: string | null
   tpmByTissue: Map<string, number> | null
   domainMax: number
+  valueMode: ExpressionValueMode
   maxWidth: number
   onAutoWidth: (px: number) => void
   onFillWidth: (px: number) => void
@@ -33,6 +35,7 @@ export default function AnatomogramRail({
   selectedTissue,
   tpmByTissue,
   domainMax,
+  valueMode,
   maxWidth,
   onAutoWidth,
   onFillWidth,
@@ -86,6 +89,7 @@ export default function AnatomogramRail({
         selectedTissue={selectedTissue}
         tpmByTissue={tpmByTissue}
         domainMax={domainMax}
+        valueMode={valueMode}
         onPick={onPickTissue}
       />
 

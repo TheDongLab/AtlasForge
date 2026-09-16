@@ -12,11 +12,12 @@ import {
 import { useExpressionMatrix } from "@/api/hooks/useExpression"
 import { useGeneById } from "@/api/hooks/useGenes"
 import { useUIStore } from "@/store/uiStore"
+import type { ExpressionValueMode } from "@/types/expression"
 import { usePublishPopup } from "@/store/usePublishPopup"
 import { uniqueFamilies, uniqueGeneOptions } from "@/utils/geneOptions"
 import { FAMILY_PARAM } from "@/utils/shareParams"
 import { useShareMirror, useShareParam } from "@/utils/useShareParam"
-import { EXPRESSION_ORDER, EXPRESSION_TISSUE } from "./shareParams"
+import { EXPRESSION_ORDER, EXPRESSION_TISSUE, EXPRESSION_VALUE } from "./shareParams"
 
 export function useExpressionState() {
   const [familyFilter, setFamilyFilter] = useShareParam(FAMILY_PARAM)
@@ -27,9 +28,12 @@ export function useExpressionState() {
   const setMetric = useUIStore((s) => s.setExpressionMetric)
   const tissue = useUIStore((s) => s.expressionTissue)
   const setTissue = useUIStore((s) => s.setExpressionTissue)
+  const valueMode = useUIStore((s) => s.expressionValueMode)
+  const setValueMode = useUIStore((s) => s.setExpressionValueMode)
 
   useShareMirror(EXPRESSION_ORDER, metric)
   useShareMirror(EXPRESSION_TISSUE, tissue)
+  useShareMirror(EXPRESSION_VALUE, valueMode)
 
   const method = resolveClusterMethod(metric, tissue)
   const { data: rows, isLoading: el, error: ee } = useExpressionMatrix(tissue)
@@ -80,6 +84,8 @@ export function useExpressionState() {
     setMetric: setMetric as (m: TreeMetric) => void,
     tissue,
     setTissue: setTissue as (t: TreeTissue) => void,
+    valueMode,
+    setValueMode: setValueMode as (m: ExpressionValueMode) => void,
     method,
   }
 }

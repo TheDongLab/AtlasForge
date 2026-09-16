@@ -134,6 +134,46 @@ def corr_distance(tpm: pl.DataFrame, sample_cols: list[str]):
     return ids, dist
 
 
+def z_score_distance(tpm: pl.DataFrame, tissue: pl.DataFrame, scope: str):
+    """Compare genes by the tissue-level shape of their expression profiles.
+
+    TPM values are averaged by tissue, log2-transformed, and standardized within each gene.
+    Genes with no variation are omitted.
+    """
+    import numpy as np
+    from scipy.spatial.distance import pdist, squareform
+
+    sample_cols = [c for c in tpm.columns if c != "gene_id"]
+    long = tpm.unpivot(
+        on=sample_cols, index="gene_id", variable_name="sample_id", value_name="tpm"
+    ).join(tissue, on="sample_id", how="inner")
+    if scope == "brain":
+        long = long.filter(pl.col("tissue") == "Brain")
+        label = pl.col("tissue_detail")
+    else:
+        label = pl.col("tissue")
+    means = long.group_by("gene_id", tissue=label).agg(pl.col("tpm").mean())
+    wide = means.pivot(on="tissue", index="gene_id", values="tpm").sort("gene_id")
+    ids = wide["gene_id"].to_list()
+    mat = wide.drop("gene_id").fill_null(0.0).to_numpy()
+
+    value = np.log2(mat + 1.0) if mat.min() >= 0 else mat
+    mean = value.mean(axis=1, keepdims=True)
+    sd = value.std(axis=1, ddof=1, keepdims=True)
+    keep = sd[:, 0] > 0
+    if not keep.all():
+        report_missing(
+            "gene",
+            "with identical expression in every tissue",
+            [g for g, k in zip(ids, keep) if not k],
+            severity=NOTE,
+            checked=len(ids),
+        )
+    z = (value[keep] - mean[keep]) / sd[keep]
+    ids = [g for g, k in zip(ids, keep) if k]
+    return ids, squareform(pdist(z, metric="euclidean"))
+
+
 def ortho_distance(gene_ids: list[str], orthologs_path: Path):
     """Measure the distance between two genes as one minus the Spearman correlation of the
     percentage identities of their orthologs across the species.

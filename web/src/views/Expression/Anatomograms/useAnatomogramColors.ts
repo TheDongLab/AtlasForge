@@ -5,7 +5,7 @@
 import { useCallback, useMemo } from "react"
 import { useTheme } from "@mui/material"
 import { alpha } from "@mui/material/styles"
-import { hexToRgb, tpmIntensity } from "@/utils/tpmColor"
+import { hexToRgb, tpmIntensity, Z_SCORE_COLORS } from "@/utils/tpmColor"
 
 const REST_ALPHA = { dark: 0.16, light: 0.13 }
 const SILHOUETTE_OPACITY = { dark: 0.34, light: 0.28 }
@@ -27,6 +27,8 @@ export function useAnatomogramColors(domainMax: number) {
       hoverAlpha: HOVER_ALPHA,
       restRgb: hexToRgb(base),
       hoverRgb: hexToRgb(theme.palette.primary.main),
+      warmRgb: hexToRgb(Z_SCORE_COLORS[theme.palette.mode].high),
+      coolRgb: hexToRgb(Z_SCORE_COLORS[theme.palette.mode].low),
     }
   }, [theme])
 
@@ -44,7 +46,21 @@ export function useAnatomogramColors(domainMax: number) {
     [domainMax, colors],
   )
 
-  return { colors, intensityFill }
+  const divergingFill = useCallback(
+    (z: number | null): string => {
+      const m = z === null ? 0 : Math.min(1, Math.abs(z) / (domainMax || 1))
+      const [r0, g0, b0] = colors.restRgb
+      const [r1, g1, b1] = z !== null && z < 0 ? colors.coolRgb : colors.warmRgb
+      const r = Math.round(r0 + (r1 - r0) * m)
+      const g = Math.round(g0 + (g1 - g0) * m)
+      const b = Math.round(b0 + (b1 - b0) * m)
+      const a = colors.restAlpha + (colors.hoverAlpha - colors.restAlpha) * m
+      return `rgba(${r},${g},${b},${a.toFixed(3)})`
+    },
+    [domainMax, colors],
+  )
+
+  return { colors, intensityFill, divergingFill }
 }
 
 export type AnatomogramColors = ReturnType<typeof useAnatomogramColors>["colors"]

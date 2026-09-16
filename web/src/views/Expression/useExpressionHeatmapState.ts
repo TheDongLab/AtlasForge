@@ -22,9 +22,9 @@ import type { CellHover } from "@/components/heatmap/types"
 import { useUIStore } from "@/store/uiStore"
 import { useElementSize } from "@/utils/useElementSize"
 import { displayTissue, sortedTissues } from "@/utils/tissue"
-import { useTpmColorScale } from "@/utils/tpmColor"
+import { useTpmColorScale, useZScoreColorScale } from "@/utils/tpmColor"
 import type { ClusterNode } from "@/types/clustering"
-import type { ExpressionRow } from "@/types/expression"
+import type { ExpressionRow, ExpressionValueMode } from "@/types/expression"
 import type { Gene } from "@/types/gene"
 import { TISSUE_LABEL_H_MIN } from "./constants"
 import { buildExpressionFigureSvg } from "./expressionFigureSvg"
@@ -46,6 +46,7 @@ interface Options {
   geneById: Map<string, Gene>
   showGeneTree: boolean
   hasLegend: boolean
+  valueMode: ExpressionValueMode
 }
 
 const rowKey = (r: ExpressionRow) => `${r.gene_id}__${r.tissue}`
@@ -60,6 +61,7 @@ export function useExpressionHeatmapState({
   geneById,
   showGeneTree,
   hasLegend,
+  valueMode,
 }: Options) {
   const theme = useTheme()
   const mode = theme.palette.mode
@@ -135,14 +137,19 @@ export function useExpressionHeatmapState({
   })
   const { matrix, gridW, gridH } = grid
 
-  const { colorFor } = useTpmColorScale(rows)
+  const { colorFor: tpmColorFor } = useTpmColorScale(rows)
+  const { colorFor: zScoreColorFor } = useZScoreColorScale(rows)
+  const colorFor = valueMode === "z-score" ? zScoreColorFor : tpmColorFor
+
+  const valueOf = useCallback(
+    (cell: ExpressionRow | null | undefined) =>
+      cell ? (valueMode === "z-score" ? cell.z_score : cell.tpm) : null,
+    [valueMode],
+  )
 
   const cellFill = useCallback(
-    (r: number, c: number) => {
-      const cell = matrix[r][c]
-      return colorFor(cell ? cell.tpm : null)
-    },
-    [matrix, colorFor],
+    (r: number, c: number) => colorFor(valueOf(matrix[r][c])),
+    [matrix, colorFor, valueOf],
   )
 
   useMatrixCanvas({
@@ -174,12 +181,12 @@ export function useExpressionHeatmapState({
         symbol: geneRows[hit.row].symbol,
         name: geneById.get(geneRows[hit.row].geneId)?.name ?? null,
         tissue: displayTissue(tissueCols[hit.col]),
-        value: cell ? cell.tpm : null,
+        value: valueOf(cell),
         clientX: e.clientX,
         clientY: e.clientY,
       })
     },
-    [hitTest, geneRows, tissueCols, matrix, geneById],
+    [hitTest, geneRows, tissueCols, matrix, geneById, valueOf],
   )
 
   const clearHover = useCallback(() => setHover(null), [])

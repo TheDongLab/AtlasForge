@@ -26,7 +26,7 @@ export const ROUTES = [
     path: "/clustering",
     label: "Clustering",
     description:
-      "Similarity trees by amino-acid, DNA (CDS), RNA co-expression, and ortholog identity",
+      "Similarity trees by amino-acid, DNA (CDS), RNA co-expression, tissue specificity, and ortholog identity",
     popup: true,
     capability: "clustering",
   }),

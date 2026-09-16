@@ -41,6 +41,7 @@ export default function AnatomogramDock({
     startResize,
     tpmByTissue,
     domainMax,
+    valueMode,
     reduceMotion,
   } = rail
 
@@ -55,6 +56,7 @@ export default function AnatomogramDock({
     selectedTissue: railTissue,
     tpmByTissue,
     domainMax,
+    valueMode,
     onPickSex: pickSex,
     onPickBrain: onScopeBrain,
     onPickTissue: pickTissue,

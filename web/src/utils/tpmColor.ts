@@ -75,3 +75,65 @@ export function useTpmColorScale(rows: ExpressionRow[]) {
 
   return { colorFor, domainMax }
 }
+
+function divergingLut(low: string, mid: string, high: string): string[] {
+  const [lr, lg, lb] = hexToRgb(low)
+  const [mr, mg, mb] = hexToRgb(mid)
+  const [hr, hg, hb] = hexToRgb(high)
+  const N = 256
+  const arr = new Array<string>(N)
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1)
+    const [a, ag, ab, br, bg, bb, u] =
+      t < 0.5 ? [lr, lg, lb, mr, mg, mb, t * 2] : [mr, mg, mb, hr, hg, hb, (t - 0.5) * 2]
+    const r = Math.round(a + (br - a) * u)
+    const g = Math.round(ag + (bg - ag) * u)
+    const b = Math.round(ab + (bb - ab) * u)
+    arr[i] = `rgb(${r},${g},${b})`
+  }
+  return arr
+}
+
+// Match the diverging endpoints to the app's blue and magenta accents
+export const Z_SCORE_COLORS = {
+  light: { low: "#4078f2", high: "#a626a4" },
+  dark: { low: "#51afef", high: "#c678dd" },
+} as const
+
+// Limit outliers to preserve contrast for most cells
+const Z_SCALE_PERCENTILE = 0.99
+
+export function useZScoreColorScale(rows: ExpressionRow[]) {
+  const theme = useTheme()
+  const mode = theme.palette.mode
+
+  const zMax = useMemo(() => {
+    const vals = rows
+      .map((r) => Math.abs(r.z_score ?? 0))
+      .filter((v) => Number.isFinite(v))
+      .sort((a, b) => a - b)
+    if (vals.length === 0) return 1
+    const idx = Math.floor(Z_SCALE_PERCENTILE * (vals.length - 1))
+    return vals[idx] || 1
+  }, [rows])
+
+  const absentColor = theme.palette.action.disabledBackground
+  const paper = theme.palette.background.paper
+  const low = Z_SCORE_COLORS[mode].low
+  const high = Z_SCORE_COLORS[mode].high
+
+  const lut = useMemo(() => divergingLut(low, paper, high), [low, paper, high])
+
+  const colorAt = useCallback((t: number) => lut[Math.round(t * (lut.length - 1))], [lut])
+
+  const colorFor = useCallback(
+    (z: number | null): string => {
+      if (z === null) return absentColor
+      const t = 0.5 + Math.max(-1, Math.min(1, z / zMax)) * 0.5
+      return colorAt(t)
+    },
+    [zMax, absentColor, colorAt],
+  )
+
+  return { colorFor, colorAt, zMax }
+}

@@ -8,4 +8,7 @@ export interface ExpressionRow {
   family: string | null
   tissue: string
   tpm: number
+  z_score: number | null
 }
+
+export type ExpressionValueMode = "tpm" | "z-score"

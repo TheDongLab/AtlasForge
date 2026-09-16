@@ -12,6 +12,8 @@ class ClusterMethod(StrEnum):
     DNA_SEQUENCE = "dna_sequence"
     RNA_COEXPRESSION_ALL = "rna_coexpression_all"
     RNA_COEXPRESSION_BRAIN = "rna_coexpression_brain"
+    TISSUE_SPECIFICITY_ALL = "tissue_specificity_all"
+    TISSUE_SPECIFICITY_BRAIN = "tissue_specificity_brain"
     ORTHOLOG_IDENTITY = "ortholog_identity"
     FAMILY_GROUPING = "family_grouping"
 

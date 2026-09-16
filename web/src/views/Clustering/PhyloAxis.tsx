@@ -12,14 +12,23 @@ export const AXIS_H = 46
 
 const LABEL_BASELINE = 16
 const TICK_STEP = 0.1
+// Unbounded distances use coarser 1–2–5 intervals to keep labels from colliding
+const MAX_FINE_TICKS = 20
+
+function niceStep(maxVal: number): number {
+  const rough = maxVal / 10
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)))
+  return ([1, 2, 5, 10].find((m) => m * mag >= rough) ?? 10) * mag
+}
 
 function axisTicks(maxVal: number): number[] {
   if (maxVal <= 0) return [0]
-  const count = Math.floor(maxVal / TICK_STEP)
-  const ticks = Array.from({ length: count + 1 }, (_, i) => Math.round(i * TICK_STEP * 1e10) / 1e10)
+  const step = maxVal / TICK_STEP > MAX_FINE_TICKS ? niceStep(maxVal) : TICK_STEP
+  const count = Math.floor(maxVal / step)
+  const ticks = Array.from({ length: count + 1 }, (_, i) => Math.round(i * step * 1e10) / 1e10)
   const lastRound = ticks[ticks.length - 1]
-  if (maxVal - lastRound > TICK_STEP * 0.01) {
-    if (ticks.length > 1 && maxVal - lastRound < TICK_STEP * 0.75) ticks.pop()
+  if (maxVal - lastRound > step * 0.01) {
+    if (ticks.length > 1 && maxVal - lastRound < step * 0.75) ticks.pop()
     ticks.push(maxVal)
   }
   return ticks

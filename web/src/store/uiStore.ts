@@ -6,6 +6,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { ThemeMode } from "@/theme"
 import type { TreeMetric, TreeTissue } from "@/api/hooks/useClustering"
+import type { ExpressionValueMode } from "@/types/expression"
 import { AUTO_CELL_SIZE, type CellSize } from "@/types/heatmap"
 import type { PanelPos } from "@/utils/useDraggablePanel"
 import { DEFAULT_PREFS, type BrowserPrefs, type GeneTrackMode } from "@/types/browser"
@@ -29,6 +30,8 @@ interface UIState {
   setExpressionMetric: (metric: TreeMetric) => void
   expressionTissue: TreeTissue
   setExpressionTissue: (tissue: TreeTissue) => void
+  expressionValueMode: ExpressionValueMode
+  setExpressionValueMode: (mode: ExpressionValueMode) => void
   clusteringMetric: TreeMetric
   setClusteringMetric: (metric: TreeMetric) => void
   clusteringTissue: TreeTissue
@@ -95,6 +98,8 @@ export const useUIStore = create<UIState>()(
       setExpressionMetric: (metric) => set({ expressionMetric: metric }),
       expressionTissue: "all",
       setExpressionTissue: (tissue) => set({ expressionTissue: tissue }),
+      expressionValueMode: "tpm",
+      setExpressionValueMode: (mode) => set({ expressionValueMode: mode }),
       clusteringMetric: "aa",
       setClusteringMetric: (metric) => set({ clusteringMetric: metric }),
       clusteringTissue: "all",

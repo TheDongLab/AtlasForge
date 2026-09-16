@@ -35,7 +35,7 @@ export const DATA_DOMAINS: DataDomain[] = [
     key: "clustering",
     label: "Clustering",
     method:
-      "Genes are grouped by similarity in protein sequence, expression pattern, or conservation across species. Protein and coding sequences are aligned before sequence-based clustering.",
+      "Genes are grouped by protein or coding-sequence similarity, RNA co-expression, tissue specificity, ortholog identity, or family.",
     capability: "clustering",
   },
   {

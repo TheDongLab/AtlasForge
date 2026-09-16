@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ReactNode } from "react"
 import { Box, Typography, useTheme } from "@mui/material"
 
 export interface LegendTick {
@@ -11,6 +12,7 @@ export interface LegendTick {
 
 interface HeatmapColorLegendProps {
   title: string
+  titleContent?: ReactNode
   colorAt: (t: number) => string // t in [0,1]
   ticks: LegendTick[]
   absent?: { color: string; label: string }
@@ -22,6 +24,7 @@ const BAR_W = 12
 
 export default function HeatmapColorLegend({
   title,
+  titleContent,
   colorAt,
   ticks,
   absent,
@@ -53,13 +56,15 @@ export default function HeatmapColorLegend({
         userSelect: "none",
       }}
     >
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ alignSelf: "stretch", fontWeight: 600, lineHeight: 1.1, textAlign: "center" }}
-      >
-        {title}
-      </Typography>
+      {titleContent ?? (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ alignSelf: "stretch", fontWeight: 600, lineHeight: 1.1, textAlign: "center" }}
+        >
+          {title}
+        </Typography>
+      )}
       <Box sx={{ position: "relative", width: BAR_W, height }}>
         <Box
           sx={{

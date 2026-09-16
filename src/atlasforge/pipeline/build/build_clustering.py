@@ -10,7 +10,14 @@ import polars as pl
 
 from ..lib import console, parquet
 
-from .clustering_metrics import codon_align, corr_distance, ortho_distance, pdistance, run_mafft
+from .clustering_metrics import (
+    codon_align,
+    corr_distance,
+    ortho_distance,
+    pdistance,
+    run_mafft,
+    z_score_distance,
+)
 from .tree_table import CLUSTERING_SCHEMA, family_grouping, tree_rows
 
 
@@ -50,6 +57,14 @@ def run(source_dir: Path, out_dir: Path, work_dir: Path, mafft: str) -> None:
         (
             "rna_coexpression_brain",
             lambda m: tree_rows(*corr_distance(tpm, brain_samples), meta, m),
+        ),
+        (
+            "tissue_specificity_all",
+            lambda m: tree_rows(*z_score_distance(tpm, tissue, "all"), meta, m),
+        ),
+        (
+            "tissue_specificity_brain",
+            lambda m: tree_rows(*z_score_distance(tpm, tissue, "brain"), meta, m),
         ),
         (
             "ortholog_identity",
