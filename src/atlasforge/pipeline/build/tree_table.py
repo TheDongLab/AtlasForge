@@ -15,8 +15,6 @@ import sys
 
 import polars as pl
 
-from ..lib.text import natural_key
-
 CLUSTERING_SCHEMA = {
     "method": pl.Utf8,
     "node_id": pl.Int64,
@@ -26,55 +24,6 @@ CLUSTERING_SCHEMA = {
     "symbol": pl.Utf8,
     "family": pl.Utf8,
 }
-
-
-def family_grouping(gene_ids: list[str], meta: dict[str, dict]) -> tuple[list[dict], str]:
-    """Group the genes by family, as a tree with a node per family under the root and the
-    genes of that family beneath it.
-
-    Every branch has a length of zero, because this says which family a gene belongs to
-    and not how far apart any two genes are.
-    """
-    fam_to_genes: dict[str, list[str]] = {}
-    for gid in gene_ids:
-        fam = meta.get(gid, {}).get("family") or "Unassigned"
-        fam_to_genes.setdefault(fam, []).append(gid)
-
-    rows: list[dict] = []
-    next_id = 0
-
-    def add(parent_id: int | None, gid: str | None = None) -> int:
-        nonlocal next_id
-        node_id = next_id
-        next_id += 1
-        m = meta.get(gid, {}) if gid else {}
-        rows.append(
-            {
-                "method": "family_grouping",
-                "node_id": node_id,
-                "parent_id": parent_id,
-                "branch_length": 0.0,
-                "gene_id": gid,
-                "symbol": m.get("symbol") if gid else None,
-                "family": m.get("family") if gid else None,
-            }
-        )
-        return node_id
-
-    root_id = add(None)
-    fam_parts: list[str] = []
-    for fam in sorted(fam_to_genes, key=natural_key):
-        fam_id = add(root_id)
-        genes = sorted(
-            fam_to_genes[fam], key=lambda g: natural_key(meta.get(g, {}).get("symbol") or g)
-        )
-        leaf_parts = []
-        for gid in genes:
-            add(fam_id, gid)
-            leaf_parts.append(f"{meta.get(gid, {}).get('symbol') or gid}:0.00000")
-        fam_parts.append("(" + ",".join(leaf_parts) + "):0.00000")
-    newick = "(" + ",".join(fam_parts) + ");"
-    return rows, newick
 
 
 def tree_rows(

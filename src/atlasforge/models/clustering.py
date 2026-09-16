@@ -15,7 +15,6 @@ class ClusterMethod(StrEnum):
     TISSUE_SPECIFICITY_ALL = "tissue_specificity_all"
     TISSUE_SPECIFICITY_BRAIN = "tissue_specificity_brain"
     ORTHOLOG_IDENTITY = "ortholog_identity"
-    FAMILY_GROUPING = "family_grouping"
 
 
 class _MethodField(BaseModel):

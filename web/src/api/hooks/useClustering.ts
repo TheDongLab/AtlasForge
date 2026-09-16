@@ -14,9 +14,8 @@ export type ClusterMethod =
   | "tissue_specificity_all"
   | "tissue_specificity_brain"
   | "ortholog_identity"
-  | "family_grouping"
 
-export type TreeMetric = "aa" | "dna" | "rna" | "tissue" | "ortho" | "family"
+export type TreeMetric = "aa" | "dna" | "rna" | "tissue" | "ortho"
 export type TreeTissue = "all" | "brain"
 
 export const SCOPED_METRICS: TreeMetric[] = ["rna", "tissue"]
@@ -29,10 +28,9 @@ export const CLUSTER_METHOD: Record<string, ClusterMethod> = {
   "tissue:all": "tissue_specificity_all",
   "tissue:brain": "tissue_specificity_brain",
   ortho: "ortholog_identity",
-  family: "family_grouping",
 }
 
-export const METRIC_ORDER: TreeMetric[] = ["aa", "dna", "rna", "tissue", "ortho", "family"]
+export const METRIC_ORDER: TreeMetric[] = ["aa", "dna", "rna", "tissue", "ortho"]
 
 export const METRIC_LABEL: Record<TreeMetric, string> = {
   aa: "Amino acid",
@@ -40,7 +38,6 @@ export const METRIC_LABEL: Record<TreeMetric, string> = {
   rna: "Co-expression",
   tissue: "Tissue specificity",
   ortho: "Orthology",
-  family: "Family",
 }
 
 export const METHOD_LABEL: Record<ClusterMethod, string> = {
@@ -51,7 +48,6 @@ export const METHOD_LABEL: Record<ClusterMethod, string> = {
   tissue_specificity_all: "Tissue specificity—all tissues",
   tissue_specificity_brain: "Tissue specificity—brain",
   ortholog_identity: "Ortholog identity similarity",
-  family_grouping: "Grouped by family",
 }
 
 export interface AxisScale {
@@ -67,7 +63,6 @@ export const AXIS_SCALE: Record<ClusterMethod, AxisScale> = {
   tissue_specificity_all: { label: "Euclidean distance (expression z-scores)", percent: false },
   tissue_specificity_brain: { label: "Euclidean distance (expression z-scores)", percent: false },
   ortholog_identity: { label: "1 − Spearman correlation (ortholog identity)", percent: false },
-  family_grouping: { label: "", percent: false },
 }
 
 export function branchDistance(scale: AxisScale, branchLength: number): string | null {

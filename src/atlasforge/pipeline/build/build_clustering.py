@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-"""Build sequence, expression, ortholog, and family-grouping trees."""
+"""Build sequence, expression, and ortholog trees."""
 
 from pathlib import Path
 
@@ -18,7 +18,7 @@ from .clustering_metrics import (
     run_mafft,
     z_score_distance,
 )
-from .tree_table import CLUSTERING_SCHEMA, family_grouping, tree_rows
+from .tree_table import CLUSTERING_SCHEMA, tree_rows
 
 
 def run(source_dir: Path, out_dir: Path, work_dir: Path, mafft: str) -> None:
@@ -70,7 +70,6 @@ def run(source_dir: Path, out_dir: Path, work_dir: Path, mafft: str) -> None:
             "ortholog_identity",
             lambda m: tree_rows(*ortho_distance(gene_ids, orthologs_path), meta, m),
         ),
-        ("family_grouping", lambda _: family_grouping(gene_ids, meta)),
     ]
 
     all_rows: list[dict] = []

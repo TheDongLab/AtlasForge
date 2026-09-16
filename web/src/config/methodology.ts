@@ -35,7 +35,7 @@ export const DATA_DOMAINS: DataDomain[] = [
     key: "clustering",
     label: "Clustering",
     method:
-      "Genes are grouped by protein or coding-sequence similarity, RNA co-expression, tissue specificity, ortholog identity, or family.",
+      "Genes are grouped by protein or coding-sequence similarity, RNA co-expression, tissue specificity, or ortholog identity.",
     capability: "clustering",
   },
   {
