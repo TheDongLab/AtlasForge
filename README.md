@@ -1,0 +1,200 @@
+# AtlasForge
+
+<p align="center"><img src="docs/atlasforge-icon.png" alt="AtlasForge icon" width="192"></p>
+
+<p align="center"> <a href="https://doi.org/10.5281/zenodo.22051284"><img src="https://zenodo.org/badge/1267592962.svg" alt="DOI"></a> <a href="https://pypi.org/project/atlasforge/"><img src="https://img.shields.io/pypi/v/atlasforge.svg" alt="PyPI version"></a> <a href="https://github.com/TheDongLab/AtlasForge/pkgs/container/atlasforge"><img src="https://img.shields.io/badge/ghcr.io-atlasforge-2496ED?logo=docker&logoColor=white" alt="Docker image"></a> <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12%2B-blue.svg" alt="Python 3.12+"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-blue.svg" alt="License: Apache-2.0"></a> <a href="https://api.reuse.software/info/github.com/TheDongLab/AtlasForge"><img src="https://api.reuse.software/badge/github.com/TheDongLab/AtlasForge" alt="REUSE status"></a> <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a> </p>
+
+AtlasForge is an open-source system that generates an interactive web atlas for any gene family through automated data retrieval and analysis.
+
+## Requirements
+- Python 3.12 or newer
+- [MAFFT](https://mafft.cbrc.jp/alignment/software/) for computing multiple-sequence alignment
+
+MAFFT is optional when both `atlasforge fetch` and `atlasforge build` use
+`--skip-clustering`.
+
+For development, the frontend requires Node.js. However, the recommended
+development setup uses Docker and the Dev Container CLI to automatically
+include all the dependencies.
+
+## Quick start
+Install the complete data pipeline:
+
+```bash
+pip install 'atlasforge[pipeline]'
+```
+Then fetch, build, and serve a family:
+
+```bash
+atlasforge fetch 752 --data-dir ./my-atlas
+atlasforge build --data-dir ./my-atlas
+atlasforge serve --data-dir ./my-atlas
+```
+**Note:** `atlasforge serve` runs the dynamic server and generates API responses on
+demand. For public or high-traffic deployments, use `atlasforge export` with a
+static web server for better performance.
+
+Here, `752` is an HGNC gene group ID. You can instead pass a text file containing
+one gene symbol or Ensembl gene ID per line, or a downloaded HGNC group TSV.
+Alternatively, you can run `atlasforge fetch` without any options for a fully
+interactive setup.
+
+The fetch command comes with an interactive setup to guide you through
+processing a new gene family. Once you run all three commands, open
+[http://localhost:8000](http://localhost:8000) to see the running atlas.
+
+The first fetch creates curation files and then pauses for user inspection.
+Review the family names, excluded genes, display symbols, species, and UniProt
+mappings in `my-atlas/curation/`, and then run the command printed in the
+terminal. Existing files are never overwritten, so you can rerun a fetch to
+update any missing data.
+
+## Documentation
+See the [documentation overview](docs/README.org) for guides to AtlasForge's files and performance.
+See [Example atlases](docs/example-atlases.org) for building the atlas using histone and HOX examples.
+
+## Available Views
+- **Genes:** Gene annotation and expandable transcript details
+- **Clustering:** Protein sequence, coding sequence, and co-expression similarity
+- **Conservation:** Orthologs across species alongside their evolutionary tree
+- **Expression:** Tissue expression with anatomy diagrams linked to the heatmap
+- **Genome Browser:** Coverage and GWAS tracks around each gene, shown with its transcript models
+- **Structure:** Predicted and experimental models with membrane topology and residue-level confidence
+
+## Screenshots
+See the [full gallery](screenshots/README.org) for more examples in light and dark themes.
+
+**Structure View:** *Predicted and experimental models shown alongside membrane topology and confidence scores. This example uses Regions mode; a per-residue snake plot is also available.*
+
+<p align="center"><a href="screenshots/09_structure-regions_hd_dark.png"><img src="screenshots/09_structure-regions_hd_dark.png" alt="Structure view" width="820"></a></p>
+
+**Expression View:** *A tissue RNA abundance heatmap linked to anatomy diagrams, with tissues highlighted on hover.*
+
+<p align="center"><a href="screenshots/07_expression-brain_hd_dark.png"><img src="screenshots/07_expression-brain_hd_dark.png" alt="Expression view" width="820"></a></p>
+
+**Genome Browser View:** *Coverage tracks, GWAS associations, and gene models aligned on a shared genomic axis.*
+
+<p align="center"><a href="screenshots/05_browser-transcripts_hd_light.png"><img src="screenshots/05_browser-transcripts_hd_light.png" alt="Genome Browser view" width="820"></a></p>
+
+## Fetch and build options
+Use `atlasforge fetch --help` and `atlasforge build --help` for the complete command
+reference. The options most often used when creating a dataset are:
+
+| Option                         | Purpose                                                                 |
+|--------------------------------|-------------------------------------------------------------------------|
+| `--curation-dir PATH`            | Store editable decisions outside the data directory                     |
+| `--gtex-version v8, v10, or v11` | Choose the GTEx release; the default is v11                             |
+| `--gtex-file PATH`               | Use a local `.gct.gz` or Parquet expression matrix                        |
+| `--ensembl-release N`            | Pin the Ensembl release; the default is 116                             |
+| `--tree-source NAME`             | Use `ensembl_compara`, `ncbi`, `timetree`, or `ucsc`                            |
+| `--promote-alias-prefix PREFIX`  | Prefer matching aliases as display symbols                              |
+| `--download-predicted`           | Keep local copies of AlphaFold models                                   |
+| `--download-experimental`        | Keep local copies of PDB structures                                     |
+| `--gene-models-file PATH`        | Use a local GTF, GFF3, or BED12 instead of a GENCODE download           |
+| `--browser-tracks PATH`          | Create the coverage curation file from an existing bigWig directory     |
+| `--browser-gwas PATH`            | Create the GWAS curation file from an existing study directory          |
+| `--local-coverage`               | Copy the coverage tracks into the site instead of reading them remotely |
+| `--browser-whole-genome`         | Keep the whole genome rather than slicing to the family's genes         |
+| `--browser-bin BASES`            | Set the finest resolution for local coverage copies; the default is 25  |
+| `--browser-max-bytes BYTES`      | Stop if local coverage copies would exceed this size in bytes           |
+| `--no-review`                    | Skip the pause for reviewing newly created curation files               |
+| `--skip-VIEW`                    | Omit browser, clustering, conservation, expression, or structure        |
+| `--step NAME`                    | Run only one named step; repeat to select several                       |
+| `--mafft PATH`                   | Use a specific MAFFT executable during the build                        |
+
+Downloaded data lives in `source/`, personal decisions in `curation/`, reusable
+downloads in `cache/`, and the finished dataset in `app/`. See [Source files](docs/source-files.org) if you
+want to edit, replace, or generate those inputs yourself.
+
+## Naming and configuration
+Each setting can be supplied as an `ATLASFORGE_*` environment variable, in a `.env` file,
+or as a flag on `atlasforge serve` and `atlasforge export`. A flag takes priority over the
+environment, which takes priority over `.env`.
+
+| Variable                   | Flag              | Purpose                                                  |
+|----------------------------|-------------------|----------------------------------------------------------|
+| `ATLASFORGE_DATA_DIR`        | `--data-dir`        | Dataset containing `curation/`, `source/`, `cache/`, and `app/`  |
+| `ATLASFORGE_WEB_DIR`         | `--web-dir`         | Built frontend files to serve                            |
+| `ATLASFORGE_APP_NAME`        | `--app-name`        | Full name used by the page and web app manifest          |
+| `ATLASFORGE_APP_SHORT_NAME`  | `--app-short-name`  | Short name used in the app bar                           |
+| `ATLASFORGE_APP_DESCRIPTION` | `--app-description` | Description shown on the Genes view and in page metadata |
+| `ATLASFORGE_FAMILY_LABEL`    | `--family-label`    | Singular name used for a family member                   |
+| `ATLASFORGE_DOWNLOAD_PREFIX` | `--download-prefix` | Prefix for downloaded figures, tables, and trees         |
+| `ATLASFORGE_CORS_ORIGINS`    | `--cors-origins`    | Comma-separated origins allowed to call the API          |
+| `ATLASFORGE_HOST`            | `--host`            | Address used by `atlasforge serve`                         |
+| `ATLASFORGE_PORT`            | `--port`            | Port used by `atlasforge serve`                            |
+
+Naming changes take effect when the site restarts or is exported again. The dataset does
+not need to be rebuilt.
+
+## Deployment
+While `atlasforge serve` is convenient for local use, a public atlas should run through Docker
+or a static web server for reliable restarts, HTTPS, and normal production traffic.
+
+### Docker
+Build the dataset first, then point the `./data` volume in `docker-compose.yml` at
+its directory and set the `ATLASFORGE_*` names for your atlas:
+
+```bash
+docker compose up --build
+```
+Open [http://localhost:8080](http://localhost:8080). The container exports the site when it starts and
+serves it through nginx. Put a reverse proxy in front of it when you need HTTPS;
+see the [nginx guide](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/) or [Caddy guide](https://caddyserver.com/docs/quick-starts/reverse-proxy) for more details on reverse proxying.
+
+### Static hosting
+Export the whole atlas when you already have a web server or want a portable snapshot:
+
+```bash
+atlasforge export ./site --data-dir ./my-atlas
+rsync -a ./site/ user@host:/var/www/atlas/
+```
+The output works with nginx, Apache, Caddy, S3, GitHub Pages, and other static
+hosts as long as it supports byte-range requests. It must also serve `404.html`
+for unknown page routes while leaving missing files under `/api/` as real 404
+responses. You can look at [deploy/nginx.conf](deploy/nginx.conf) for a complete example.
+Re-export after changing the dataset or the site name.
+
+To sync the exported atlas to an S3 bucket, use the AWS CLI:
+
+```bash
+aws s3 sync ./site/ s3://example-atlas-bucket/
+```
+A typical AWS deployment uses the S3 bucket as the origin and puts CloudFront in
+front of it for HTTPS, a custom domain, and CDN caching. After an update, cached
+files with stable names may need a CloudFront invalidation. See
+[scripts/deploy.sh](scripts/deploy.sh) for a complete example that assigns cache headers, preserves
+the large data trees unless pruning is requested, and invalidates changed binary files.
+
+## Development
+The dev container is the easiest way to setup the project with Python, Node.js,
+MAFFT, and the project dependencies bundled. Install Docker and the Dev
+Container CLI, and then run:
+
+```bash
+./enter-dev.sh
+./dev-zellij.sh
+```
+The frontend runs at [http://localhost:3000](http://localhost:3000) and sends API requests to FastAPI at
+[http://localhost:8000](http://localhost:8000). See [Dev container setup](.devcontainer/README.org) for direct CLI commands and container
+details.
+
+For a manual setup:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e '.[pipeline,dev]'
+npm --prefix web ci
+fastapi dev src/atlasforge/main.py --host 0.0.0.0 --port 8000
+npm --prefix web run dev
+```
+Run the two development servers in separate terminals. Before submitting a change, run
+`black --check src scripts`, `npm --prefix web run format:check`, and
+`npm --prefix web run build`.
+
+## Licensing
+This project is licensed under the Apache-2.0 license and is fully
+[REUSE-compliant](https://reuse.software/). Anatomogram artwork from EMBL-EBI is available under CC BY
+4.0; see [Anatomogram Artwork](web/src/views/Expression/Anatomograms/anatomogram/ATTRIBUTION.org) for its source, attribution, and modification
+details.
